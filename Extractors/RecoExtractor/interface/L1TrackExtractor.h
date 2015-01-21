@@ -121,9 +121,12 @@ class L1TrackExtractor
   int m_trk;  // Number of L1Tracks in the event
   
   std::vector<float>               *m_trk_pt;    // pt calculated for track i (in GeV/c) 
+  std::vector<float>               *m_trk_invR;  // curvature calculated for track i (in 1/cm) 
   std::vector<float>               *m_trk_eta;   // eta calculated for track i 
   std::vector<float>               *m_trk_phi;   // phi calculated for track i (in rad)
   std::vector<float>               *m_trk_z;     // z0 calculated for track i (in mm)
+  std::vector<float>               *m_trk_chi24; // chi2 calculated for track i (4 parameters)
+  std::vector<float>               *m_trk_chi25; // chi2 calculated for track i (5 parameters)
   std::vector< std::vector<int> >  *m_trk_links; // Links to the stubs making the tracks in L1TkStubs tree
   std::vector<int>                 *m_trk_secid; // Sector number
 

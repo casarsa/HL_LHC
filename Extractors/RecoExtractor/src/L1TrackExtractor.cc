@@ -16,9 +16,12 @@ L1TrackExtractor::L1TrackExtractor(edm::InputTag STUB_tag, edm::InputTag PATT_ta
   m_patt_secid   = new  std::vector<int>;
   
   m_trk_pt       = new  std::vector<float>;
+  m_trk_invR     = new  std::vector<float>;
   m_trk_eta      = new  std::vector<float>;
   m_trk_phi      = new  std::vector<float>;
   m_trk_z        = new  std::vector<float>;
+  m_trk_chi24    = new  std::vector<float>;
+  m_trk_chi25    = new  std::vector<float>;
   m_trk_links    = new  std::vector< std::vector<int> >;
   m_trk_secid    = new  std::vector<int>;
 
@@ -41,10 +44,13 @@ L1TrackExtractor::L1TrackExtractor(edm::InputTag STUB_tag, edm::InputTag PATT_ta
     m_tree->Branch("L1TRK_n",            &m_trk);
     m_tree->Branch("L1TRK_links",        &m_trk_links);
     m_tree->Branch("L1TRK_secid",        &m_trk_secid);
+    m_tree->Branch("L1TRK_invR",         &m_trk_invR);
     m_tree->Branch("L1TRK_pt",           &m_trk_pt);
     m_tree->Branch("L1TRK_phi",          &m_trk_phi);
     m_tree->Branch("L1TRK_z",            &m_trk_z);
     m_tree->Branch("L1TRK_eta",          &m_trk_eta);
+    m_tree->Branch("L1TRK_chi24",        &m_trk_chi24);
+    m_tree->Branch("L1TRK_chi25",        &m_trk_chi25);
   }
 }
 
@@ -56,11 +62,14 @@ L1TrackExtractor::L1TrackExtractor(TFile *a_file)
   m_patt_secid   = new  std::vector<int>;
   
   m_trk_pt       = new  std::vector<float>;
+  m_trk_invR     = new  std::vector<float>;
   m_trk_eta      = new  std::vector<float>;
   m_trk_phi      = new  std::vector<float>;
   m_trk_z        = new  std::vector<float>;
   m_trk_links    = new  std::vector< std::vector<int> >;
   m_trk_secid    = new  std::vector<int>;
+  m_trk_chi24    = new  std::vector<float>;
+  m_trk_chi25    = new  std::vector<float>;
 
   // Tree definition
   m_OK = false;
@@ -90,9 +99,12 @@ L1TrackExtractor::L1TrackExtractor(TFile *a_file)
   m_tree->SetBranchAddress("L1TRK_links",        &m_trk_links);
   m_tree->SetBranchAddress("L1TRK_secid",        &m_trk_secid);
   m_tree->SetBranchAddress("L1TRK_pt",           &m_trk_pt);
+  m_tree->SetBranchAddress("L1TRK_invR",         &m_trk_invR);
   m_tree->SetBranchAddress("L1TRK_phi",          &m_trk_phi);
   m_tree->SetBranchAddress("L1TRK_z",            &m_trk_z);
   m_tree->SetBranchAddress("L1TRK_eta",          &m_trk_eta);
+  m_tree->SetBranchAddress("L1TRK_chi24",        &m_trk_chi24);
+  m_tree->SetBranchAddress("L1TRK_chi25",        &m_trk_chi25);
   
   std::cout << "This file contains " << m_n_events << " events..." << std::endl;
 }
@@ -233,6 +245,7 @@ void L1TrackExtractor::writeInfo(const edm::Event *event, StubExtractor *stub)
 	    iterTTTrack != TTTrackHandle->end();
 	    ++iterTTTrack )
       {
+
 	edm::Ptr< TTTrack< Ref_PixelDigi_ > > tempTrackPtr( TTTrackHandle, tkCnt++ );
 	
 	/// Get everything is relevant
@@ -246,10 +259,13 @@ void L1TrackExtractor::writeInfo(const edm::Event *event, StubExtractor *stub)
 	
 	m_trk_secid->push_back(tempTrackPtr->getSector());
 	m_trk_pt->push_back(tempTrackPtr->getMomentum(5).perp() );
+	m_trk_invR->push_back(tempTrackPtr->getRInv(5) );
 	m_trk_eta->push_back(tempTrackPtr->getMomentum(5).eta());
 	m_trk_phi->push_back(tempTrackPtr->getMomentum(5).phi());
 	m_trk_z->push_back(tempTrackPtr->getPOCA(5).z());
-	
+	m_trk_chi24->push_back(tempTrackPtr->getChi2(4));
+	m_trk_chi25->push_back(tempTrackPtr->getChi2(5));
+
 	//	std::cout << tempTrackPtr->getMomentum(5).perp() << " / " 
 	//	  << tempTrackPtr->getMomentum(5).eta() << " / " 
 	//		  << tempTrackPtr->getPOCA(5).z() << " / " 
@@ -257,10 +273,12 @@ void L1TrackExtractor::writeInfo(const edm::Event *event, StubExtractor *stub)
 	//	  << std::endl;
 	
 	stub_list.clear();
-	
+
+
 	for(unsigned int i=0;i<trackStubs.size();i++)
 	{
 	  //	  std::cout << "A" << std::endl;
+
 	  edm::Ref< edmNew::DetSetVector< TTStub< Ref_PixelDigi_ > >, TTStub< Ref_PixelDigi_ > > tempStubRef = trackStubs.at(i);
 	  //	  std::cout << "B" << std::endl;	  
 
@@ -322,9 +340,12 @@ void L1TrackExtractor::reset()
   m_patt_secid->clear(); 
   
   m_trk_pt->clear();    
+  m_trk_invR->clear();    
   m_trk_eta->clear();   
   m_trk_phi->clear();   
   m_trk_z->clear();     
+  m_trk_chi24->clear();    
+  m_trk_chi25->clear();    
   m_trk_links->clear(); 
   m_trk_secid->clear(); 
 }
